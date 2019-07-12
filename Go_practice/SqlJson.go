@@ -1,9 +1,10 @@
+//Mysql to Json file
+
 package main
 
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -18,25 +19,47 @@ type Database struct {
 	Data string
 }
 
-func dbConn() (db *sql.DB) {
+func accessCode() string {
 	dbUser := os.Getenv("SQL_DB_USER")
 	dbPS := os.Getenv("SQL_DB_PS")
-	login := dbUser + ":" + dbPS + "@/fina_db"
-	db, err := sql.Open("mysql", string(login))
-	if err != nil {
-		log.Fatal("db error.")
-	} else {
-		fmt.Println("access")
-	}
-	return db
+
+	code := dbUser + ":" + dbPS + "@/fina_db"
+
+	return code
+}
+
+func dbConn() (db *sql.DB, err error) {
+	//dbUser := os.Getenv("SQL_DB_USER")
+	//dbPS := os.Getenv("SQL_DB_PS")
+	//login := dbUser + ":" + dbPS + "@/fina_db"
+	login := accessCode()
+
+	db, error := sql.Open("mysql", string(login))
+	//if err != nil {
+	//	log.Fatal("db error.")
+	//} else {
+	//	log.Println("access")
+	//}
+	return db, error
 }
 
 func main() {
-	db := dbConn()
+	db, err := dbConn()
+
+	if err != nil {
+		log.Println("Wrong user, id")
+		panic(err.Error())
+
+		return emp, err
+	}
+	defer db.Close()
+
 	selDB, err := db.Query("SELECT * FROM test ORDER BY id DESC")
 	if err != nil {
 		panic(err.Error())
 	}
+	defer db.Close()
+
 	emp := Database{}
 	var table []Database
 	for selDB.Next() {
@@ -57,6 +80,5 @@ func main() {
 	}
 	file, _ := json.MarshalIndent(table, "", " ")
 	_ = ioutil.WriteFile("test.json", file, 0644)
-	//fmt.Println(file.)
-	defer db.Close()
+
 }

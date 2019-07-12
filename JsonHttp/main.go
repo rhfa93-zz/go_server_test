@@ -25,15 +25,24 @@ const (
 
 var tmpl = template.Must(template.ParseGlob("form/*"))
 
-func dbConn() (db *sql.DB) {
+func accessCode() string {
 	dbUser := os.Getenv("SQL_DB_USER")
+	//dbUser := "test"
 	dbPS := os.Getenv("SQL_DB_PS")
-	login := dbUser + ":" + dbPS + "@/fina_db"
-	db, err := sql.Open("mysql", string(login))
-	if err != nil {
-		log.Fatal("db error.")
-	}
-	return db
+	code := dbUser + ":" + dbPS + "@/fina_db"
+
+	return code
+}
+
+func dbConn() (db *sql.DB, err error) {
+	//	dbUser := os.Getenv("SQL_DB_USER")
+	//	dbPS := os.Getenv("SQL_DB_PS")
+	//login := dbUser + ":" + dbPS + "@/fina_db"
+	//var err error
+
+	login := accessCode()
+	db, error := sql.Open("mysql", string(login))
+	return db, error
 }
 
 func SelectSQL(searchID int) (Database, error) {
@@ -42,12 +51,22 @@ func SelectSQL(searchID int) (Database, error) {
 	var id, num int
 	var date, data string
 
-	db := dbConn()
-	selDB, err := db.Query("SELECT * FROM test WHERE id=?", searchID)
+	db, err := dbConn()
+
 	if err != nil {
+		log.Println("Wrong user, id")
+		panic(err.Error())
+
 		return emp, err
 	}
 	defer db.Close()
+
+	selDB, err := db.Query("SELECT * FROM test WHERE id=?", searchID)
+	if err != nil {
+		log.Println("Wrong table")
+		panic(err.Error())
+		return emp, err
+	}
 	for selDB.Next() {
 
 		err = selDB.Scan(&id, &num, &date, &data)
@@ -55,11 +74,6 @@ func SelectSQL(searchID int) (Database, error) {
 			return emp, err
 		}
 		return Database{Id: id, Num: num, Date: date, Data: data}, nil
-		//emp.Id = id
-		//emp.Num = num
-		//emp.Date = date
-		//emp.Data = data
-
 	}
 	return emp, nil
 }
