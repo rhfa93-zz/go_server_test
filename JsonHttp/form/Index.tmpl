@@ -1,0 +1,24 @@
+{{ define "Index" }}
+    <h2> Registered </h2>
+    <table border="1">
+      <thead>
+      <tr>
+        <td>ID</td>
+        <td>Num</td>
+        <td>Date</td>
+        <td>Data</td>
+      </tr>
+       </thead>
+       <tbody>
+    {{ range . }}
+      <tr>
+        <td>{{ .Id }}</td>
+        <td> {{ .Num }} </td>
+        <td>{{ .Date }} </td> 
+        <td>{{ .Data }} </td> 
+      </tr>
+    {{ end }}
+       </tbody>
+    </table>
+  {{ template "Footer" }}
+{{ end }}

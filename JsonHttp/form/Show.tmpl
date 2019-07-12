@@ -1,0 +1,25 @@
+{{ define "Show" }}
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <table border="1">
+      <thead>
+      <tr>
+        <td>ID</td>
+        <td>NUM</td>
+        <td>DATE</td>
+        <td>DATA</td>
+      </tr>
+       </thead>
+       <tbody>
+       <tr>
+        <td>{{ .Id }}</td>
+        <td> {{ .Num }} </td>
+        <td>{{ .Date }} </td> 
+        <td>{{ .Data }} </td> 
+        </tr>
+        </tbody>
+
+    </table>
+  </head>
+{{ end }}
